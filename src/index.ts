@@ -47,18 +47,18 @@ class RagDocsServer {
   async run() {
     try {
       // Initialize Qdrant collection
-      console.log("Initializing Qdrant collection...");
+      console.error("Initializing Qdrant collection...");
       await this.apiClient.initCollection(COLLECTION_NAME);
-      console.log("Qdrant collection initialized successfully");
+      console.error("Qdrant collection initialized successfully");
 
       // Start web interface
       await this.webInterface.start();
-      console.log("Web interface is running");
+      console.error("Web interface is running");
 
       // Start MCP server
       const transport = new StdioServerTransport();
       await this.server.connect(transport);
-      console.log("RAG Docs MCP server running on stdio");
+      console.error("RAG Docs MCP server running on stdio");
     } catch (error) {
       console.error("Failed to initialize server:", error);
       process.exit(1);

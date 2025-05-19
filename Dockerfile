@@ -8,8 +8,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json for npm install
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies without running prepare scripts
+RUN npm ci --production=false --ignore-scripts
 
 # Copy the entire source code to the working directory
 COPY . .
@@ -20,6 +20,9 @@ RUN npm run build
 # Stage 2: Run the project
 FROM node:18
 
+# Install Playwright dependencies
+RUN npx playwright install-deps chromium
+
 # Set working directory
 WORKDIR /app
 
@@ -27,10 +30,18 @@ WORKDIR /app
 COPY --from=builder /app/build /app/build
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/package.json /app/package.json
+COPY --from=builder /app/src/public /app/src/public
+
+# Install Playwright browsers after dependencies are copied
+RUN npx playwright install chromium
 
 # Define environment variables
 ENV OPENAI_API_KEY=your-api-key-here
-ENV QDRANT_URL=http://localhost:6333
+ENV QDRANT_URL=http://qdrant:6333
+ENV EMBEDDING_PROVIDER=ollama
+
+# Expose port 3030 for the web interface
+EXPOSE 3030
 
 # Start the application
 CMD ["node", "build/index.js"]

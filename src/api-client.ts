@@ -25,7 +25,7 @@ if ((EMBEDDING_PROVIDER === 'openai' || FALLBACK_PROVIDER === 'openai') && !OPEN
 }
 
 if (EMBEDDING_PROVIDER === 'ollama') {
-  console.warn('Using Ollama as primary provider. Make sure Ollama is running locally.');
+  console.error('Using Ollama as primary provider. Make sure Ollama is running locally.');
 }
 
 export class ApiClient {

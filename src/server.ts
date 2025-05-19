@@ -107,7 +107,7 @@ export class WebInterface {
       if (!fs.existsSync(this.queuePath)) {
         // Create the file if it doesn't exist
         await fs.promises.writeFile(this.queuePath, "", "utf8");
-        console.log("Queue file created at:", this.queuePath);
+        console.error("Queue file created at:", this.queuePath);
       }
     } catch (error) {
       console.error("Error initializing queue file:", error);
@@ -197,19 +197,19 @@ export class WebInterface {
 
         // Read the queue file directly to get pending items
         const queueContent = await fs.promises.readFile(this.queuePath, "utf8");
-        console.log("Queue file content:", queueContent);
+        console.error("Queue file content:", queueContent);
 
         const pendingUrls = queueContent
           .split("\n")
           .filter((line) => line.trim());
-        console.log("Pending URLs:", pendingUrls);
+        console.error("Pending URLs:", pendingUrls);
 
         // Get processing status from list-queue tool
         const response = await this.listQueueTool.execute({});
-        console.log("List queue tool response:", response);
+        console.error("List queue tool response:", response);
 
         const queueText = response.content[0].text;
-        console.log("Queue text from tool:", queueText);
+        console.error("Queue text from tool:", queueText);
 
         const processingItems = queueText
           .split("\n")
@@ -223,7 +223,7 @@ export class WebInterface {
               timestamp: timestamp || new Date().toISOString(),
             };
           });
-        console.log("Processing items:", processingItems);
+        console.error("Processing items:", processingItems);
 
         // Combine pending and processing items
         const queue = [
@@ -239,7 +239,7 @@ export class WebInterface {
           // Add processing items
           ...processingItems,
         ];
-        console.log("Final queue:", queue);
+        console.error("Final queue:", queue);
 
         res.json(queue);
       } catch (error) {
@@ -494,7 +494,7 @@ export class WebInterface {
   async start() {
     const port = await getAvailablePort(3030);
     this.server = this.app.listen(port, () => {
-      console.log(`Web interface running at http://localhost:${port}`);
+      console.error(`Web interface running at http://localhost:${port}`);
     });
   }
 
@@ -502,7 +502,7 @@ export class WebInterface {
     if (this.server) {
       return new Promise((resolve) => {
         this.server.close(() => {
-          console.log("Web interface stopped");
+          console.error("Web interface stopped");
           resolve(true);
         });
       });

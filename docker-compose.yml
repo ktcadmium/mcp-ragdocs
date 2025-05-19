@@ -9,11 +9,20 @@ services:
       - qdrant_storage:/qdrant/storage
     environment:
       - QDRANT_ALLOW_RECOVERY=true
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
+  mcp-ragdocs:
+    build: .
+    restart: always
+    ports:
+      - "3030:3030"  # Web interface
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - EMBEDDING_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    depends_on:
+      - qdrant
+    volumes:
+      - ./queue.txt:/app/queue.txt  # Persist queue file
 
 volumes:
   qdrant_storage:

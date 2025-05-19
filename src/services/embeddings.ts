@@ -1,4 +1,4 @@
-import ollama from 'ollama';
+import { Ollama } from 'ollama/browser';
 import OpenAI from 'openai';
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 
@@ -9,15 +9,18 @@ export interface EmbeddingProvider {
 
 export class OllamaProvider implements EmbeddingProvider {
   private model: string;
+  private ollama: Ollama;
 
   constructor(model: string = 'nomic-embed-text') {
     this.model = model;
+    const baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+    this.ollama = new Ollama({ host: baseUrl });
   }
 
   async generateEmbeddings(text: string): Promise<number[]> {
     try {
       console.error('Generating Ollama embeddings for text:', text.substring(0, 50) + '...');
-      const response = await ollama.embeddings({
+      const response = await this.ollama.embeddings({
         model: this.model,
         prompt: text
       });
